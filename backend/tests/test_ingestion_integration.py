@@ -19,7 +19,6 @@ from typing import Any, cast
 import pytest
 from fastapi import BackgroundTasks
 
-import app.services.ingestion as ingestion
 from app.config import PLACEHOLDER_USER_ID, STORAGE_BUCKET
 from app.repos.documents import DocumentsRepo
 from app.repos.storage import StorageRepo
@@ -39,9 +38,7 @@ PNG_1X1 = bytes.fromhex(
     not (os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_SERVICE_ROLE_KEY")),
     reason="requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY",
 )
-def test_ingest_creates_row_and_storage_object(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(ingestion, "STATUS_STUB_DELAY_SECONDS", 0.0)
-
+def test_ingest_creates_row_and_storage_object() -> None:
     client = get_supabase()
     service = IngestionService(storage=StorageRepo(), documents=DocumentsRepo())
     background = BackgroundTasks()
@@ -72,6 +69,9 @@ def test_ingest_creates_row_and_storage_object(monkeypatch: pytest.MonkeyPatch) 
         assert row["storage_path"] == expected_path
         assert row["status"] == "review"
         assert row["user_id"] == str(PLACEHOLDER_USER_ID)
+        # T3: preprocessing persisted mode + pages (a PNG upload -> vision, 1 page).
+        assert row["mode"] == "vision"
+        assert row["pages"] == 1
 
         # Storage object present under the document's folder.
         objects = client.storage.from_(STORAGE_BUCKET).list(f"{PLACEHOLDER_USER_ID}/{document_id}")
