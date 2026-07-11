@@ -69,9 +69,9 @@ class DocumentsRepo:
         block and history list surface.
         """
         confirmed_at = datetime.now(UTC).isoformat()
-        self._client.table(_TABLE).update(
-            {"status": "confirmed", "confirmed_at": confirmed_at}
-        ).eq("id", str(document_id)).execute()
+        self._client.table(_TABLE).update({"status": "confirmed", "confirmed_at": confirmed_at}).eq(
+            "id", str(document_id)
+        ).execute()
 
     def get_by_id(self, document_id: UUID) -> dict[str, Any] | None:
         """Return the document row, or None if it does not exist (T7)."""

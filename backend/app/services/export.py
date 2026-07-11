@@ -115,4 +115,4 @@ def content_disposition(filename: str) -> str:
     `filename*`, plus the real UTF-8 name via `filename*`.
     """
     ascii_fallback = filename.encode("ascii", "replace").decode("ascii").replace('"', "_")
-    return f'attachment; filename="{ascii_fallback}"; filename*=UTF-8\'\'{quote(filename)}'
+    return f"attachment; filename=\"{ascii_fallback}\"; filename*=UTF-8''{quote(filename)}"
